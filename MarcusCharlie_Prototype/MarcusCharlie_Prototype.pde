@@ -128,6 +128,5 @@ void loadAlertEngine() {
 
 void loadSlider() {
   float currentFreq = sl.getValue();
-  println(currentFreq);
   wp.setFrequency(currentFreq);
 }
