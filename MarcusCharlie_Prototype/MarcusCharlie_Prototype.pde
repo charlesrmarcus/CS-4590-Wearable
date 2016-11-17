@@ -73,7 +73,14 @@ void setup() {
   //Slider Setup
   sl = p5.addSlider("Frequency")
          .setPosition(65, 125)
+         .setMin(220)
+         .setMax(440)
+         .setValue(440)
          ;
+  
+  wp = new WavePlayer(ac, 220.0f, Buffer.SINE);
+  wp.pause(true);
+  ac.out.addInput(wp);
          
   //Ambient and Alert Setup
   ambient = getSamplePlayer("piano2.wav");
@@ -88,6 +95,13 @@ void draw() {
  background(0); 
  loadAmbientEngine();
  loadAlertEngine();
+ loadSlider();
+}
+
+void controlEvent(ControlEvent e) {
+  if (e.isFrom(frequency)) {
+    wp.pause(!wp.isPaused());
+  }
 }
 
 void loadAmbientEngine() {
@@ -114,6 +128,6 @@ void loadAlertEngine() {
 
 void loadSlider() {
   float currentFreq = sl.getValue();
-  wp = new WavePlayer(ac, currentFreq, Buffer.SINE);
-  ac.out.addInput(wp);
+  println(currentFreq);
+  wp.setFrequency(currentFreq);
 }
