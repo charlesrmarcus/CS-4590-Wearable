@@ -5,7 +5,7 @@ import org.jaudiolibs.beads.*;
 //Global Variables
 SamplePlayer sp, alert, ambient;
 ControlP5 p5;
-Button frequency, b1, b2, b3, b4, b5, b6;
+Button frequency, stop, b1, b2, b3, b4, b5, b6;
 Slider sl;
 WavePlayer wp;
 
@@ -69,6 +69,10 @@ void setup() {
                 .setPosition(75, 155)
                 .setSize(90, 35)
                 ;
+                
+  stop = p5.addButton("Stop")
+                .setPosition(75, 195)
+                .setSize(90, 35);
   
   //Slider Setup
   sl = p5.addSlider("Frequency")
@@ -96,6 +100,7 @@ void draw() {
  loadAmbientEngine();
  loadAlertEngine();
  loadSlider();
+ loadStop();
 }
 
 void controlEvent(ControlEvent e) {
@@ -129,4 +134,12 @@ void loadAlertEngine() {
 void loadSlider() {
   float currentFreq = sl.getValue();
   wp.setFrequency(currentFreq);
+}
+
+void loadStop() {
+ if (stop.isPressed() == true) {
+   ambient.pause(true);
+   sp.pause(true);
+ }
+  
 }
