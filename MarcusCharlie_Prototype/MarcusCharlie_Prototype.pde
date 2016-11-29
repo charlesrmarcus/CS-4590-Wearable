@@ -6,8 +6,10 @@ import org.jaudiolibs.beads.*;
 SamplePlayer sp, alert, ambient;
 ControlP5 p5;
 Button frequency, stop, b1, b2, b3, b4, b5, b6;
+Button start_tts, stop_tts, change_tts;
 Slider sl;
 WavePlayer wp;
+TextToSpeechMaker ttsMaker;
 
 //Get Ambient Sounds
 void getAmbientSound(String filepath) {
@@ -27,7 +29,7 @@ void getAlertSound(String filepath) {
 }
 
 void setup() {
-  size(320, 240);
+  size(500, 240);
   noStroke();
   
   //Instantiate Global Variables
@@ -35,48 +37,64 @@ void setup() {
   p5 = new ControlP5(this);
   
   //Create Buttons
-  b1 = p5.addButton("Alert_1")
+  b1 = p5.addButton("Alert")
          .setSize(60, 35)
-         .setPosition(25,75)
+         .setPosition(405,15)
          ;
          
-  b2 = p5.addButton("Alert_2")
-         .setSize(60, 35)
-         .setPosition(90,75)
-         ;
+  //b2 = p5.addButton("Alert_2")
+  //       .setSize(60, 35)
+  //       .setPosition(90,75)
+  //       ;
          
-  b3 = p5.addButton("Alert_3")
-         .setSize(60, 35)
-         .setPosition(155,75)
-         ;
+  //b3 = p5.addButton("Alert_3")
+  //       .setSize(60, 35)
+  //       .setPosition(155,75)
+  //       ;
   
-  b4 = p5.addButton("Ambient_1")
+  b4 = p5.addButton("Slow")
          .setSize(60, 35)
-         .setPosition(25,30)
+         .setPosition(25, 85)
          ;
          
-  b5 = p5.addButton("Ambient_2")
+  b5 = p5.addButton("Medium")
          .setSize(60, 35)
-         .setPosition(90,30)
+         .setPosition(95, 85)
          ;
          
-  b6 = p5.addButton("Ambient_3")
-         .setSize(60, 35)
-         .setPosition(155,30)
-         ;
-         
+  b6 = p5.addButton("Fast")
+        .setSize(60, 35)
+        .setPosition(165,85)
+        ;
+        
+  //TTS Buttons
+  start_tts = p5.addButton("Start_TTS")
+                .setSize(60, 35)
+                .setPosition(265, 85)
+                ;
+                
+  change_tts = p5.addButton("Change_TTS")
+                .setSize(60, 35)
+                .setPosition(335, 85)
+                ;
+                
+  stop_tts = p5.addButton("Stop_TTS")
+                .setSize(60, 35)
+                .setPosition(405, 85)
+                ;
+      
+  //Slider & Frequency Setup
   frequency = p5.addButton("Play Frequency")
-                .setPosition(75, 155)
+                .setPosition(125, 15)
                 .setSize(90, 35)
                 ;
                 
   stop = p5.addButton("Stop")
-                .setPosition(75, 195)
+                .setPosition(25, 15)
                 .setSize(90, 35);
   
-  //Slider Setup
   sl = p5.addSlider("Frequency")
-         .setPosition(65, 125)
+         .setPosition(225, 25)
          .setMin(220)
          .setMax(440)
          .setValue(440)
@@ -91,16 +109,20 @@ void setup() {
   ambient.pause(true);
   sp = getSamplePlayer("piano2.wav");
   sp.pause(true);
+  
+  //Text To Speech Setup
+  ttsMaker = new TextToSpeechMaker();
          
   ac.start();
 }
 
 void draw() {
- background(0); 
- loadAmbientEngine();
- loadAlertEngine();
- loadSlider();
- loadStop();
+  background(0); 
+  loadAmbientEngine();
+  loadAlertEngine();
+  loadTTSEngine();
+  loadSlider();
+  loadStop();
 }
 
 void controlEvent(ControlEvent e) {
@@ -111,23 +133,28 @@ void controlEvent(ControlEvent e) {
 
 void loadAmbientEngine() {
   if (b4.isPressed() == true) {
-     getAmbientSound("low_ambient.wav");
+     getAmbientSound("slow_tempo.wav");
   } else if (b5.isPressed() == true) {
-     getAmbientSound("mid_ambient.wav");
+     getAmbientSound("medium_tempo.wav");
   } else if (b6.isPressed() == true) {
-     getAmbientSound("high_ambient.wav"); 
+     getAmbientSound("fast_tempo.wav"); 
   }
   
 }
   
-
 void loadAlertEngine() {
   if (b1.isPressed() == true) {
      getAlertSound("piano2.wav");
-  } else if (b2.isPressed() == true) {
-     getAlertSound("piano3.wav");
-  } else if (b3.isPressed() == true) {
-     getAlertSound("piano5.wav"); 
+  }
+}
+
+void loadTTSEngine() {
+  if (start_tts.isPressed() == true) {
+     ttsPlayer("Start Exercise"); 
+  } else if (change_tts.isPressed() == true) {
+     ttsPlayer("Change Exercise"); 
+  } else if (stop_tts.isPressed() == true) {
+     ttsPlayer("Stop Exercise"); 
   }
 }
 
@@ -141,5 +168,13 @@ void loadStop() {
    ambient.pause(true);
    sp.pause(true);
  }
+}
+
+void ttsPlayer(String inputSpeech) {
+  String ttsFilePath = ttsMaker.createTTSWavFile(inputSpeech);
+  SamplePlayer sp = getSamplePlayer(ttsFilePath, true);
   
+  ac.out.addInput(sp);
+  sp.setToLoopStart();
+  sp.start();
 }
