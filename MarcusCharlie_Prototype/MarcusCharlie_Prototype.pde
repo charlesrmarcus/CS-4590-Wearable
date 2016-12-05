@@ -3,13 +3,14 @@ import beads.*;
 import org.jaudiolibs.beads.*;
 
 //Global Variables
-SamplePlayer sp, alert, ambient;
+SamplePlayer sp, alert, ambient, met;
 ControlP5 p5;
 Button frequency, stop, b1, b2, b3, b4, b5, b6, w1, w2, w3;
 Button start_tts, stop_tts, change_tts;
 Slider sl;
 WavePlayer wp, wp1, wp2, wp3;
 TextToSpeechMaker ttsMaker;
+Clock clock1, clock2, clock3;
 
 //Get Ambient Sounds
 void getAmbientSound(String filepath) {
@@ -115,6 +116,47 @@ void setup() {
          .setValue(440)
          ;
   
+  met = getSamplePlayer("met.wav");
+  met.pause(true);
+  ac.out.addInput(met);
+  
+  clock1 = new Clock(ac, 430f);
+  clock1.addMessageListener(new Bead() {
+        public void messageReceived(Bead message) {
+          if(clock1.isBeat()) {
+            met.reset();
+            met.pause(false);
+          }
+        }
+      });
+   clock1.pause(true);
+   ac.out.addDependent(clock1);
+   
+  clock2 = new Clock(ac, 316f);
+  clock2.addMessageListener(new Bead() {
+        public void messageReceived(Bead message) {
+          if(clock2.isBeat()) {
+            met.reset();
+            met.pause(false);
+          }
+        }
+      });
+   clock2.pause(true);
+   ac.out.addDependent(clock2);
+   
+  clock3 = new Clock(ac, 250f);
+  clock3.addMessageListener(new Bead() {
+        public void messageReceived(Bead message) {
+          if(clock3.isBeat()) {
+            met.reset();
+            met.pause(false);
+          }
+        }
+      });
+   clock3.pause(true);
+   ac.out.addDependent(clock3);
+    
+  
   wp = new WavePlayer(ac, 220.0f, Buffer.SINE);
   wp.pause(true);
   ac.out.addInput(wp);
@@ -145,11 +187,8 @@ void setup() {
 
 void draw() {
   background(0); 
-  loadAmbientEngine();
-  loadAlertEngine();
   loadTTSEngine();
   loadSlider();
-  loadStop();
 }
 
 void controlEvent(ControlEvent e) {
@@ -161,24 +200,18 @@ void controlEvent(ControlEvent e) {
     wp2.pause(!wp2.isPaused());
   } else if (e.isFrom(w3)) {
     wp3.pause(!wp3.isPaused());
-  }
-}
-
-void loadAmbientEngine() {
-  if (b4.isPressed() == true) {
-     getAmbientSound("slow_tempo.wav");
-  } else if (b5.isPressed() == true) {
-     getAmbientSound("medium_tempo.wav");
-  } else if (b6.isPressed() == true) {
-     getAmbientSound("fast_tempo.wav"); 
-  }
-  
-}
-  
-void loadAlertEngine() {
-  if (b1.isPressed() == true) {
-     getAlertSound("piano2.wav");
-  }
+  } else if (e.isFrom(b4)) {
+    clock1.pause(!clock1.isPaused());
+  } else if (e.isFrom(b5)) {
+    clock2.pause(!clock2.isPaused());
+  } else if (e.isFrom(b6)) {
+    clock3.pause(!clock3.isPaused());
+  } else if (e.isFrom(b1)) {
+    getAlertSound("piano2.wav");
+  } else if (e.isFrom(stop)) {
+    ambient.pause(true);
+    sp.pause(true);
+  } 
 }
 
 void loadTTSEngine() {
@@ -194,23 +227,6 @@ void loadTTSEngine() {
 void loadSlider() {
   float currentFreq = sl.getValue();
   wp.setFrequency(currentFreq);
-}
-
-void loadStop() {
- if (stop.isPressed() == true) {
-   ambient.pause(true);
-   sp.pause(true);
- }
-}
-
-void loadFrequencies() {
-  if (w1.isPressed() == true) {
-     wp1.pause(!wp1.isPaused());
-  } else if (w2.isPressed() == true) {
-     wp2.pause(!wp2.isPaused());
-  } else if (w3.isPressed() == true) {
-     wp3.pause(!wp3.isPaused());
-  }
 }
 
 void ttsPlayer(String inputSpeech) {
