@@ -5,10 +5,10 @@ import org.jaudiolibs.beads.*;
 //Global Variables
 SamplePlayer sp, alert, ambient;
 ControlP5 p5;
-Button frequency, stop, b1, b2, b3, b4, b5, b6;
+Button frequency, stop, b1, b2, b3, b4, b5, b6, w1, w2, w3;
 Button start_tts, stop_tts, change_tts;
 Slider sl;
-WavePlayer wp;
+WavePlayer wp, wp1, wp2, wp3;
 TextToSpeechMaker ttsMaker;
 
 //Get Ambient Sounds
@@ -66,6 +66,21 @@ void setup() {
         .setSize(60, 35)
         .setPosition(165,85)
         ;
+
+  w1 = p5.addButton("Frequency 1")
+        .setSize(60,35)
+        .setPosition(25, 140)
+        ;
+        
+  w2 = p5.addButton("Frequency 2")
+        .setSize(60,35)
+        .setPosition(95, 140)
+        ;
+
+  w3 = p5.addButton("Frequency 3")
+        .setSize(60,35)
+        .setPosition(165, 140)
+        ;
         
   //TTS Buttons
   start_tts = p5.addButton("Start_TTS")
@@ -112,6 +127,18 @@ void setup() {
   
   //Text To Speech Setup
   ttsMaker = new TextToSpeechMaker();
+  
+  wp1 = new WavePlayer(ac, 440.0, Buffer.SINE);
+  wp1.pause(true);
+  ac.out.addInput(wp1);
+  
+  wp2 = new WavePlayer(ac, 660.0, Buffer.SINE);
+  wp2.pause(true);
+  ac.out.addInput(wp2);
+  
+  wp3 = new WavePlayer(ac, 880.0, Buffer.SINE);
+  wp3.pause(true);
+  ac.out.addInput(wp3);
          
   ac.start();
 }
@@ -128,6 +155,12 @@ void draw() {
 void controlEvent(ControlEvent e) {
   if (e.isFrom(frequency)) {
     wp.pause(!wp.isPaused());
+  } else if (e.isFrom(w1)) {
+    wp1.pause(!wp1.isPaused());
+  } else if (e.isFrom(w2)) {
+    wp2.pause(!wp2.isPaused());
+  } else if (e.isFrom(w3)) {
+    wp3.pause(!wp3.isPaused());
   }
 }
 
@@ -168,6 +201,16 @@ void loadStop() {
    ambient.pause(true);
    sp.pause(true);
  }
+}
+
+void loadFrequencies() {
+  if (w1.isPressed() == true) {
+     wp1.pause(!wp1.isPaused());
+  } else if (w2.isPressed() == true) {
+     wp2.pause(!wp2.isPaused());
+  } else if (w3.isPressed() == true) {
+     wp3.pause(!wp3.isPaused());
+  }
 }
 
 void ttsPlayer(String inputSpeech) {
